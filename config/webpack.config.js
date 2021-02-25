@@ -1,4 +1,4 @@
-'use strict';
+
 
 const fs = require('fs');
 const path = require('path');
@@ -29,10 +29,17 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 
 const postcssNormalize = require('postcss-normalize');
 
+const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
+const WebpackBar = require('webpackbar');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer'); // 生成 report.html 可视化打包分析
+
 const appPackageJson = require(paths.appPackageJson);
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
+
+// 是否开启 report.html
+const isBundleAnalyzer = process.env.GENERATE_BUNDLE_ANALYZER_REPORT === 'true';
 
 const webpackDevClientEntry = require.resolve(
   'react-dev-utils/webpackHotDevClient'
@@ -63,6 +70,9 @@ const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
+// 加上匹配 less 文件的正则
+const lessRegex = /\.less$/;
+const lessModuleRegex = /\.module\.less$/;
 
 const hasJsxRuntime = (() => {
   if (process.env.DISABLE_NEW_JSX_TRANSFORM === 'true') {
@@ -139,6 +149,28 @@ module.exports = function (webpackEnv) {
       },
     ].filter(Boolean);
     if (preProcessor) {
+      let preProcessorRule = {
+        loader: require.resolve(preProcessor),
+        options: {
+          sourceMap: true
+        }
+      }
+      // `less-loader`就生成针对less的options
+      if (preProcessor === 'less-loader') {
+        preProcessorRule = {
+          loader: require.resolve(preProcessor),
+          options: {
+            sourceMap: true,
+            lessOptions: { // 如果使用less-loader@5，需要移除 lessOptions 这一级
+              javascriptEnabled: true,
+              modifyVars: {
+                'primary-color': '#346fff', // 全局主色
+                'link-color': '#346fff' // 链接色
+              }
+            }
+          }
+        }
+      }
       loaders.push(
         {
           loader: require.resolve('resolve-url-loader'),
@@ -147,12 +179,7 @@ module.exports = function (webpackEnv) {
             root: paths.appSrc,
           },
         },
-        {
-          loader: require.resolve(preProcessor),
-          options: {
-            sourceMap: true,
-          },
-        }
+        preProcessorRule
       );
     }
     return loaders;
@@ -534,6 +561,34 @@ module.exports = function (webpackEnv) {
                 'sass-loader'
               ),
             },
+            // 在下面加上 less-loader 配置
+            {
+              test: lessRegex,
+              exclude: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 2,
+                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                },
+                'less-loader'
+              ),
+              sideEffects: true,
+            },
+            // Adds support for CSS Modules, but using less
+            // using the extension .module.less
+            {
+              test: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 2,
+                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                  modules: {
+                    getLocalIdent: getCSSModuleLocalIdent
+                  }
+                },
+                'less-loader'
+              ),
+            },
             // "file" loader makes sure those assets get served by WebpackDevServer.
             // When you `import` an asset, you get its (virtual) filename.
             // In production, they would get copied to the `build` folder.
@@ -557,6 +612,14 @@ module.exports = function (webpackEnv) {
       ],
     },
     plugins: [
+      // antd moment 替换为 dayjs
+      new AntdDayjsWebpackPlugin(),
+      // webpack 自带进度
+      new webpack.ProgressPlugin(),
+      // WebpackBar用来显示编译时长
+      new WebpackBar(),
+      // 生产环境下 根据 isBundleAnalyzer 决定是否生成 report
+      isEnvProduction && isBundleAnalyzer && new BundleAnalyzerPlugin(),
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         Object.assign(

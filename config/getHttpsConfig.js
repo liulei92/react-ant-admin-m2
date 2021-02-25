@@ -1,4 +1,4 @@
-'use strict';
+
 
 const fs = require('fs');
 const path = require('path');
@@ -62,5 +62,7 @@ function getHttpsConfig() {
   }
   return isHttps;
 }
+
+// const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
 
 module.exports = getHttpsConfig;
