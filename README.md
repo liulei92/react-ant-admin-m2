@@ -285,3 +285,6 @@ if (preProcessor) {
   );
 }
 ```
+
+## create-react-app 一些常用的自定义配置
+[https://www.jianshu.com/p/36efe1dc2f5e](https://www.jianshu.com/p/36efe1dc2f5e)

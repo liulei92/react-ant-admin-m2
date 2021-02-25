@@ -1,65 +1,26 @@
-import { Button } from "antd";
-import logo from "./logo.svg";
-import "./App.css";
-import axios from "axios";
-import { useState, useCallback, useEffect } from "react";
+import { Redirect, Route, Switch, withRouter } from "react-router-dom";
+import { Home } from "@/pages";
+import { Routers } from "@/routers";
+console.log(Home);
 
 function App() {
-  const [tableInfo, setTableInfo] = useState<any>({});
-  const getMyTable = useCallback(() => {
-    axios({
-      url: "api/mytable", //不用引入，直接在api后面接接口
-      method: "get",
-      data: {},
-    })
-      .then((result) => {
-        console.log(result);
-        setTableInfo(result.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  useEffect(() => {
-    getMyTable();
-    return () => {
-      // clearEffect
-    };
-  }, [getMyTable]);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <ul>
-          {tableInfo?.banner?.map((item: any) => {
-            return (
-              <li key={item?.id}>
-                <img src={item.imgurl} alt={item.title} />
-                <p>{item.title}</p>
-              </li>
-            );
-          })}
-        </ul>
-
-        <Button type="primary" onClick={getMyTable}>
-          re get
-        </Button>
-      </header>
-    </div>
+    <Switch>
+      {Routers.map((router) => (
+        <Route
+          exact={!router.notExect}
+          key={router.path}
+          path={router.path}
+          component={router.component}
+        />
+      ))}
+      {/* 设置默认路由 推荐方法一*/}
+      {/* 方法一 */}
+      {/* <Route path="/" component={Home} exact></Route> */}
+      {/* 方法二 重定向*/}
+      <Redirect path="/" to="/home" />
+    </Switch>
   );
 }
 
-export default App;
+export default withRouter(App);

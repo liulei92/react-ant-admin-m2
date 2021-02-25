@@ -1,15 +1,31 @@
 // 兼容 ie11
 import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
 import App from "./App";
+import { HashRouter as Router, Route, Switch } from "react-router-dom";
+
 import reportWebVitals from "./reportWebVitals";
+
+import "normalize.css";
+import "./index.css";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Router>
+      {/* 使用了路由懒加载，所以需要使用<Suspense>包起来 */}
+      <Suspense fallback={<div />}>
+        <Switch>
+          <Route
+            path="/"
+            render={(routerProps) => {
+              return <App {...routerProps} />;
+            }}
+          />
+        </Switch>
+      </Suspense>
+    </Router>
   </React.StrictMode>,
   document.getElementById("root")
 );
