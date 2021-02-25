@@ -3,29 +3,35 @@ import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
+import { Provider } from "react-redux";
 import { HashRouter as Router, Route, Switch } from "react-router-dom";
+import App from "./App";
+import _createStore from "@/store";
 
 import reportWebVitals from "./reportWebVitals";
 
 import "normalize.css";
 import "./index.css";
 
+const store = _createStore();
+
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      {/* 使用了路由懒加载，所以需要使用<Suspense>包起来 */}
-      <Suspense fallback={<div />}>
-        <Switch>
-          <Route
-            path="/"
-            render={(routerProps) => {
-              return <App {...routerProps} />;
-            }}
-          />
-        </Switch>
-      </Suspense>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        {/* 使用了路由懒加载，所以需要使用<Suspense>包起来 */}
+        <Suspense fallback={<div />}>
+          <Switch>
+            <Route
+              path="/"
+              render={(routerProps) => {
+                return <App {...routerProps} />;
+              }}
+            />
+          </Switch>
+        </Suspense>
+      </Router>
+    </Provider>
   </React.StrictMode>,
   document.getElementById("root")
 );
