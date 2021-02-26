@@ -8,5 +8,6 @@ import { lazy } from "react";
 
 const Home = lazy(() => import("./Home"));
 const About = lazy(() => import("./About"));
+const Hooks = lazy(() => import("./Hooks"));
 
-export { Home, About };
+export { Home, About, Hooks };

@@ -3,7 +3,7 @@
  * @Date: 2021-02-25 17:57:37
  * @Author: LeiLiu
  */
-import { Home, About } from "@/pages";
+import { Home, About, Hooks } from "@/pages";
 
 export type RouterType = {
   path: string;
@@ -22,6 +22,11 @@ const Routers: RouterType[] = [
   {
     path: "/about",
     component: About,
+    root: [],
+  },
+  {
+    path: "/hooks",
+    component: Hooks,
     root: [],
   },
 ];

@@ -5,7 +5,7 @@
  */
 import { Dispatch } from "redux";
 import * as TYPES from "./types";
-import axios from "axios";
+import axios from "@/utils/axios";
 
 export function changeCount(value: any) {
   return { type: TYPES.CHANGE_COUNT, value };
