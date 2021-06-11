@@ -16,11 +16,18 @@ export function kugouRankGet() {
     const result = await axios({
       url: "api/rank/list",
       method: "get",
-      params: {},
+      params: {}
     });
     dispatch({
       type: TYPES.CHANGE_KUGOU_RANK,
-      value: result?.data?.data || [],
+      value: result?.data?.data || []
     });
+  };
+}
+
+export function changeUUID() {
+  return {
+    type: TYPES.CHANGE_RANDOM_UUID,
+    value: Math.random().toString(36).slice(2)
   };
 }

@@ -5,11 +5,9 @@
  */
 import { memo } from "react";
 import { useSelector } from "react-redux";
-import { StateType } from "@/store/state";
 
 function Counter() {
-  console.log(1);
-  const count = useSelector<StateType>((state) => state.count);
+  const count = useSelector<Store.State>((state) => state.count);
 
   return <>{count}</>;
 }

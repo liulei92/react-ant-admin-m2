@@ -5,12 +5,14 @@
  */
 import { useCallback, useEffect, useState, useRef } from "react";
 import { Button } from "antd";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Counter from "@/components/Counter";
-import { changeCount, kugouRankGet } from "@/store/action";
+import { changeCount, kugouRankGet, changeUUID } from "@/store/action";
 
 export default function Home(props: any) {
   const dispatch = useDispatch();
+  const uuid = useSelector((state: Store.State) => state.uuid);
+
   const changeCountHandler = useCallback(() => {
     const value = Math.floor(Math.random() * 10);
     dispatch(changeCount(value));
@@ -22,6 +24,10 @@ export default function Home(props: any) {
     console.log(counter);
     console.log(likeRef.current);
   }, [counter, likeRef]);
+
+  const changeUUIDHandler = () => {
+    dispatch(changeUUID());
+  };
 
   useEffect(() => {
     dispatch(kugouRankGet());
@@ -47,6 +53,8 @@ export default function Home(props: any) {
       <br />
       <Counter />
       <Button onClick={changeCountHandler}>Change Count</Button>
+      <hr />
+      <Button onClick={changeUUIDHandler}>{uuid || "uuid"}</Button>
     </div>
   );
 }

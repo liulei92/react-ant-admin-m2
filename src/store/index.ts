@@ -3,10 +3,12 @@
  * @Date: 2021-02-25 22:49:45
  * @Author: LeiLiu
  */
-import { createStore, applyMiddleware } from "redux";
+import { createStore, applyMiddleware, combineReducers } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import thunk from "redux-thunk";
-import reducer from "./reducer";
+// import reducer from "./reducer";
+import * as reducers from "./reducers";
+console.log(reducers);
 
 /* enhancer是对store的增强，可以增强store的api
 redux中的中间件，比如thunk， 增强的是store.dispatch
@@ -15,7 +17,14 @@ export default function _createStore() {
   const middlewares = [thunk];
   const enhancers = applyMiddleware(...middlewares);
   const composedEnhancers = composeWithDevTools(...[enhancers]);
-  const store = createStore(reducer, composedEnhancers);
+  // const store = createStore(reducer, composedEnhancers);
 
+  const store = createStore(
+    combineReducers({
+      ...reducers
+    }),
+
+    composedEnhancers
+  );
   return store;
 }
